@@ -234,7 +234,7 @@ print('Number of features: {}'.format(ends[-1]), flush = True)
 lambdas = {}
 for i, ind in enumerate(inds):
     logreg = LogisticRegression(random_state=0, penalty='l1', solver='liblinear', max_iter=200, class_weight='balanced')
-    gs = RandomizedSearchCV(logreg, {'C':st.loguniform(a = 0.1, b = 0.3)}, n_iter = 100, cv=10, scoring = 'roc_auc')
+    gs = RandomizedSearchCV(logreg, {'C':st.loguniform(a = 0.1, b = 0.3)}, n_iter = 10, cv=5, scoring = 'roc_auc')
     gs.fit(X_train[:,ind[0]:ind[1]], y_train)
     C = gs.cv_results_['param_C'].data
     mean_score = gs.cv_results_['mean_test_score']
@@ -289,7 +289,7 @@ pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
 for i_model, rare in enumerate(rares):
     pmm_params['lambda_{}'.format(i_model)] = st.loguniform(a = lambdas[i_model]/2., b = lambdas[i_model])
 pmm = PostMendelianModel(rares = rares, inds = inds)
-gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=5)
+gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 10, cv=5)
 gs.fit(X_train, y_train)
 
 rare_w_best = gs.best_params_['rare_w']
