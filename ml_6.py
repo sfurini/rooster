@@ -208,10 +208,18 @@ gc2_columns = df_gc2.columns
 orl = LogisticAT(alpha=0)
 orl.fit(age[ind_train].reshape((-1,1)), grading[ind_train])
 
+delta_grading = grading - orl.predict(age.reshape(-1, 1))
+ind_train = np.array([ind for ind in ind_train if delta_grading[ind] != 0])
+ind_test = np.array([ind for ind in ind_test if delta_grading[ind] != 0])
+y_train = (delta_grading>0)[ind_train]#((grading[ind_train] - orl.predict(age[ind_train].reshape((-1, 1)))) > 0).astype(int)
+y_test = (delta_grading>0)[ind_test]#((grading[ind_test] - orl.predict(age[ind_test].reshape((-1, 1)))) > 0).astype(int)
 X_train = np.concatenate( (al1[ind_train, :], al2[ind_train, :], gc1[ind_train, :], gc2[ind_train, :]), axis = 1 )
 X_test = np.concatenate( (al1[ind_test, :], al2[ind_test, :], gc1[ind_test, :], gc2[ind_test, :]), axis = 1 )
-y_train = ((grading[ind_train] - orl.predict(age[ind_train].reshape((-1, 1)))) > 0).astype(int)
-y_test = ((grading[ind_test] - orl.predict(age[ind_test].reshape((-1, 1)))) > 0).astype(int)
+
+#X_train = np.concatenate( (al1[ind_train, :], al2[ind_train, :], gc1[ind_train, :], gc2[ind_train, :]), axis = 1 )
+#X_test = np.concatenate( (al1[ind_test, :], al2[ind_test, :], gc1[ind_test, :], gc2[ind_test, :]), axis = 1 )
+#y_train = ((grading[ind_train] - orl.predict(age[ind_train].reshape((-1, 1)))) > 0).astype(int)
+#y_test = ((grading[ind_test] - orl.predict(age[ind_test].reshape((-1, 1)))) > 0).astype(int)
 
 plot_olr(age[ind_train], grading[ind_train], orl.predict(age[ind_train].reshape((-1, 1))), 'figure_{}_{}_olr_train.pdf'.format(sex,rep))
 plot_olr(age[ind_test], grading[ind_test], orl.predict(age[ind_test].reshape((-1, 1))), 'figure_{}_{}_olr_test.pdf'.format(sex, rep))
