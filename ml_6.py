@@ -236,6 +236,9 @@ for i, ind in enumerate(inds):
     plt.xscale('log')
     pdf.savefig()
     plt.close()
+
+# post medelian 1
+
 pmm = PostMendelianModel1(rares = rares, inds = inds, lambda_0 = lambdas[0], lambda_1 = lambdas[1], lambda_2 = lambdas[2], lambda_3 = lambdas[3])
 pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
 gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=10)
