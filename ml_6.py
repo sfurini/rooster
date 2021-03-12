@@ -123,6 +123,13 @@ class PostMendelianModel(LogisticRegression):
     def score(self, X, y):
         return roc_auc_score(y.astype(float), self.predict(X))
 
+class PostMendelianModel1(PostMendelianModel):
+    def set_params(self, **kwargs):
+        self.rares = kwargs.get('rares',self.rares)
+        self.inds = kwargs.get('inds',self.inds)
+        self.rare_w = kwargs.get('rare_w',self.rare_w)
+        return self
+    
 class AdjustGrading(object):
     """
     orl con bootstrap
@@ -229,7 +236,7 @@ for i, ind in enumerate(inds):
     plt.xscale('log')
     pdf.savefig()
     plt.close()
-pmm = PostMendelianModel(rares = rares, inds = inds, lambda_0 = lambdas[0], lambda_1 = lambdas[1], lambda_2 = lambdas[2], lambda_3 = lambdas[3])
+pmm = PostMendelianModel1(rares = rares, inds = inds, lambda_0 = lambdas[0], lambda_1 = lambdas[1], lambda_2 = lambdas[2], lambda_3 = lambdas[3])
 pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
 gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=10)
 gs.fit(X_train, y_train)
@@ -255,7 +262,7 @@ lambda_3_best = lambdas[3]
 pmm = PostMendelianModel(rares=rares, inds=inds, rare_w=rare_w_best,
                         lambda_0=lambda_0_best, lambda_1=lambda_1_best, lambda_2=lambda_2_best, lambda_3=lambda_3_best)
 pmm.fit(X_train, y_train)
-print('Score train:', pmm.score(X_train, y_test))
+print('Score train:', pmm.score(X_train, y_train))
 print('Score test:', pmm.score(X_test, y_test))
 
 for (e, cols), name_rep in zip(enumerate((al1_columns, al2_columns, gc1_columns, gc2_columns)), ('al1', 'al2', 'gc1', 'gc2')):
