@@ -277,7 +277,6 @@ for i, ind in enumerate(inds):
 
 # post medelian 2
 
-rare_w_best = gs.best_params_['rare_w']
 lambda_0_best = lambdas[0]
 lambda_1_best = lambdas[1]
 lambda_2_best = lambdas[2]
