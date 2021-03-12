@@ -277,11 +277,6 @@ for i, ind in enumerate(inds):
 
 # post medelian 2
 
-lambda_0_best = lambdas[0]
-lambda_1_best = lambdas[1]
-lambda_2_best = lambdas[2]
-lambda_3_best = lambdas[3]
-
 pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
 for i_model, rare in enumerate(rares):
     pmm_params['lambda_{}'.format(i_model)] = st.loguniform(a = lambdas[i_model]/2., b = lambdas[i_model])
