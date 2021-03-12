@@ -117,6 +117,8 @@ class PostMendelianModel(LogisticRegression):
                 self.coef_[ind[0]:ind[1]] = self.rare_w * model.coef_
             else:
                 self.coef_[ind[0]:ind[1]] =  model.coef_
+        idx_not_null = self.coef_ != 0
+        self.coef_[idx_not_null] = 2*(self.coef_[idx_not_null]>0)-1
     def predict(self, X):
         s = np.dot(X,self.coef_.reshape(-1,1))
         return s
@@ -237,13 +239,7 @@ for i, ind in enumerate(inds):
     pdf.savefig()
     plt.close()
 
-# post medelian 1
-
-pmm = PostMendelianModel1(rares = rares, inds = inds, lambda_0 = lambdas[0], lambda_1 = lambdas[1], lambda_2 = lambdas[2], lambda_3 = lambdas[3])
-pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
-gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=10)
-gs.fit(X_train, y_train)
-print(gs.cv_results_)
+# post medelian 3
 
 #pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
 #for i_model, rare in enumerate(rares):
@@ -253,49 +249,77 @@ print(gs.cv_results_)
 #gs.fit(X_train, y_train)
 #print(gs.cv_results_)
  
-rare_w_best = gs.best_params_['rare_w']
+#rare_w_best = gs.best_params_['rare_w']
 #lambda_0_best = gs.best_params_['lambda_0']
 #lambda_1_best = gs.best_params_['lambda_1']
 #lambda_2_best = gs.best_params_['lambda_2']
 #lambda_3_best = gs.best_params_['lambda_3']
-lambda_0_best = lambdas[0]
-lambda_1_best = lambdas[1]
-lambda_2_best = lambdas[2]
-lambda_3_best = lambdas[3]
-pmm = PostMendelianModel(rares=rares, inds=inds, rare_w=rare_w_best,
-                        lambda_0=lambda_0_best, lambda_1=lambda_1_best, lambda_2=lambda_2_best, lambda_3=lambda_3_best)
-pmm.fit(X_train, y_train)
-print('Score train:', pmm.score(X_train, y_train))
-print('Score test:', pmm.score(X_test, y_test))
+#pmm = PostMendelianModel(rares=rares, inds=inds, rare_w=rare_w_best,
+#                        lambda_0=lambda_0_best, lambda_1=lambda_1_best, lambda_2=lambda_2_best, lambda_3=lambda_3_best)
 
 
-# post medelian 2
+# post medelian 1
+
+#pmm = PostMendelianModel1(rares = rares, inds = inds, lambda_0 = lambdas[0], lambda_1 = lambdas[1], lambda_2 = lambdas[2], lambda_3 = lambdas[3])
+#pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
+#gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=10)
+#gs.fit(X_train, y_train)
+#print(gs.cv_results_)
 
 #rare_w_best = gs.best_params_['rare_w']
 #lambda_0_best = lambdas[0]
 #lambda_1_best = lambdas[1]
 #lambda_2_best = lambdas[2]
 #lambda_3_best = lambdas[3]
-#
-#pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
-#for i_model, rare in enumerate(rares):
-#    pmm_params['lambda_{}'.format(i_model)] = st.loguniform(a = lambdas[i_model]/2., b = lambdas[i_model])
-#pmm = PostMendelianModel(rares = rares, inds = inds)
-#gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=5)
-#gs.fit(X_train, y_train)
-#
-#rare_w_best = gs.best_params_['rare_w']
-#lambda_0_best = gs.best_params_['lambda_0']
-#lambda_1_best = gs.best_params_['lambda_1']
-#lambda_2_best = gs.best_params_['lambda_2']
-#lambda_3_best = gs.best_params_['lambda_3']
-#
 #pmm = PostMendelianModel(rares=rares, inds=inds, rare_w=rare_w_best,
 #                        lambda_0=lambda_0_best, lambda_1=lambda_1_best, lambda_2=lambda_2_best, lambda_3=lambda_3_best)
-#pmm.fit(X_train, y_train)
-#print('Score train:', pmm.score(X_train, y_train))
-#print('Score test:', pmm.score(X_test, y_test))
 
+
+# post medelian 2
+
+rare_w_best = gs.best_params_['rare_w']
+lambda_0_best = lambdas[0]
+lambda_1_best = lambdas[1]
+lambda_2_best = lambdas[2]
+lambda_3_best = lambdas[3]
+
+pmm_params = {'rare_w': scipy.stats.uniform(loc=0.1, scale=9.9)}
+for i_model, rare in enumerate(rares):
+    pmm_params['lambda_{}'.format(i_model)] = st.loguniform(a = lambdas[i_model]/2., b = lambdas[i_model])
+pmm = PostMendelianModel(rares = rares, inds = inds)
+gs = RandomizedSearchCV(pmm, pmm_params, n_iter = 100, cv=5)
+gs.fit(X_train, y_train)
+
+rare_w_best = gs.best_params_['rare_w']
+lambda_0_best = gs.best_params_['lambda_0']
+lambda_1_best = gs.best_params_['lambda_1']
+lambda_2_best = gs.best_params_['lambda_2']
+lambda_3_best = gs.best_params_['lambda_3']
+
+pmm = PostMendelianModel(rares=rares, inds=inds, rare_w=rare_w_best,
+                        lambda_0=lambda_0_best, lambda_1=lambda_1_best, lambda_2=lambda_2_best, lambda_3=lambda_3_best)
+
+
+
+pmm.fit(X_train, y_train)
+print('Score train:', pmm.score(X_train, y_train))
+print('Score test:', pmm.score(X_test, y_test))
+
+
+genetic_score_test = pmm.predict(X_test).T[0]
+pl.figure()
+sns.distplot(genetic_score_test[y_test==0], color='g', bins=10, label='mild')
+sns.distplot(genetic_score_test[y_test==1], color='r', bins=10, label='severe')
+err_test = np.random.normal(0, 0.005, genetic_score_test.shape[0])
+pl.plot(genetic_score_test[y_test==1], err_test[y_test==1] - 0.04, 'or', alpha=0.5)
+pl.plot(genetic_score_test[y_test==0], err_test[y_test==0] - 0.08, 'og', alpha=0.5)
+pl.xlim([-40, 40])
+pl.ylim([-0.15, 0.3])
+pl.xlabel('polygenic score')
+pl.ylabel('frequency in the cohort')
+pl.legend()
+pl.show()
+pl.savefig('{}_{}_{}.pdf'.format('test', sex, rep))
 
 
 for (e, cols), name_rep in zip(enumerate((al1_columns, al2_columns, gc1_columns, gc2_columns)), ('al1', 'al2', 'gc1', 'gc2')):
